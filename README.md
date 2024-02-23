@@ -42,8 +42,10 @@ This is a demo for how to use gRPC transconding with grpc-gateway and envoy, it'
 
 2. Build helloworld
 
+```shell
 cd helloworld
 make bin
+```
 
 3. Launch `greeter_server`/`greeter_gateway`
 
