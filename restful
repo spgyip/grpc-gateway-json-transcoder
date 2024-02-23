@@ -11,7 +11,7 @@ case "${target}" in
                address="http://localhost:51051"
     ;;
     *) echo "Invalid target: \"${target}\""
-       echo "Usage: sh request [gateway|envoy]"
+       echo "Usage: sh $0 [gateway|envoy]"
        exit 1
     ;;
 esac

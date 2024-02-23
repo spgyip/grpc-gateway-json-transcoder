@@ -11,11 +11,7 @@ proto:
 		--include_imports --include_source_info \
 		--descriptor_set_out=helloworld/helloworld.pb \
         helloworld/helloworld.proto
-
-		#--go_opt=Mhelloworld/helloworld.proto=github.com/spgyip/grpc-gateway-json-transcoding/helloworld \
-# -o helloworld/helloworld.pb \
-#-I ./ \
-#-I $(GOPATH)/src/github.com/googleapis/googleapis/  \
+	cp -v helloworld/helloworld.pb ../envoy-config/
 
 clean:
 	rm -fv bin/*

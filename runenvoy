@@ -1,0 +1,9 @@
+#!/bin/bash
+
+docker run -p 9901:9901 \
+        -p 51051:51051 \
+        -it --rm \
+        -v ${PWD}/envoy-config/:/etc/envoy/ \
+        envoyproxy/envoy:v1.29.0 \
+        -c /etc/envoy/envoy.yaml \
+        --log-level debug

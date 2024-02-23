@@ -1,0 +1,9 @@
+#!/bin/bash
+
+[ $# -eq 0 ] && echo "Usage: $0 <localhost-ip>" && exit 1
+
+IP=$1
+sed -i -E "s/__LOCALHOST/${IP}/g" envoy-config/envoy.yaml
+
+echo "Have configured LOCALHOST as \"${IP}\" for envoy-config/envoy.yaml."
+
