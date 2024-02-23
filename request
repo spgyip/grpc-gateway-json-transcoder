@@ -1,0 +1,19 @@
+#!/bin/bash
+
+target=$1
+address="http://nowhere"
+
+case "${target}" in 
+    "gateway") echo "target gateway"
+               address="http://localhost:52051"
+    ;;
+    "envoy") echo "target gateway"
+               address="http://localhost:51051"
+    ;;
+    *) echo "Invalid target: \"${target}\""
+       echo "Usage: sh request [gateway|envoy]"
+       exit 1
+    ;;
+esac
+
+curl -X POST -d '{"name": "world", "sub": {"id": 123, "text": "supergui"}}' -v ${address}/v1/sayhello
