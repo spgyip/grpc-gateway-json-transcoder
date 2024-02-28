@@ -1,35 +1,46 @@
-It's very popular to use RESTful JSON API developing applications, meanwhile we want to write gRPC service only. There are two ways of transcoding from RESTful to gRPC.
+RESTful JSON API is very broadly used to develope web applications, also it's really efficient to test with toolkits like curl. Meanwhile we want to write gRPC service only. So, it's realistic to support RESTful communication to gRPC server. Let's demonstrate several ways.
 
-- Using [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
-- Using [envoy](https://envoyproxy.io) as proxy.
+- [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
+- [envoyproxy](https://envoyproxy.io).
+- [grpcurl](https://github.com/fullstorydev/grpcurl).
 
-All these are supported by [gRPC transcoding](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding).
+Few features are supported by `gRPC`/`protobuf`.
 
-# Notice
+- [gRPC transcoding](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding).
+- [Descriptors](https://buf.build/docs/reference/descriptors)
 
-This is a demo for how to use gRPC transconding with grpc-gateway and envoy, it's only supported in localhost.
+> This demo is simple, and should be runned as local.
 
 # Topology
 
 ```
-         ------------------------------------------------------------------------
-         |                      greeter_server                                  |
-         ----------------(         50051             )---------------------------
-                             /\    /\              /\
-                              |     |               |
-                              |     -----[gRPC]--   --------------[gRPC]---
-                              |                 |                         |
-                              |       -------------------------    ----------------------
-                              |      |   grpc_gateway         |    |     envoy          |
-                              |       -------(52051)----------     --------(51051)-------
-                              |                 /\                          /\
-                    ---[gRPC]--                 |                           |
-                    |                       [RESTful]       -----[RESTful] ---
-                    |                           |           |
-         -------------------        ------------------------------------------
-         | greeter_client  |        |                 cURL                   |
-         -------------------        ------------------------------------------
+         --------------------------------------------------------------------------------------------------------------
+         |                                                 greeter_server                                             |
+         ---------------------------------------------------(port:50051)-----------------------------------------------
+                                                                 /\              
+                                                                  |              
+                                                                [gRPC]
+                                                                  |
+                    ------------------------------------------------------------------------------------------------------
+                   /\                              /\                               /\                            |      |
+                    |                               |                                |                            |      |
+                    |                    -------------------------    ---------------------------                 |      |
+                    |                    |      grpc_gateway     |    |         envoy           |                 |      |
+                    |                    -------(port:52051)------    --------(port:51051)-------                 |   /reflection 
+                    |                               /\                            /\                              |      |
+                    |                                |                             |                              |      |  |*helloworld.pb*|
+                    |                                -------------------------------                              |      |        |
+                    |                                          |                                                  |      |        |
+                    |                                      [RESTful]                                              |      |     (-protoset)
+                    |                                          |                                                  |      |        |
+         -------------------        ---------------------------------------------------------------       ---------------------   |
+         | greeter_client  |        |                     cURL                                    |       |     grpcurl       |<--|
+         -------------------        ---------------------------------------------------------------       ---------------------
 ```
+
+Protocol explanation:
+- gRPC: http2+proto, no TLS default.
+- RESTful: http+JSON
 
 
 # How-to
