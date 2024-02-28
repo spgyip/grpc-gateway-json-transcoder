@@ -16,4 +16,4 @@ case "${target}" in
     ;;
 esac
 
-curl -X POST -d '{"name": "world", "sub": {"id": 123, "text": "supergui"}}' -v ${address}/v1/sayhello
+curl -X POST -d '{"name": "world", "sub": {"id": 123, "text": "supergui"}}' ${address}/v1/sayhello

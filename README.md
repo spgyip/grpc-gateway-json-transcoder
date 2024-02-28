@@ -38,45 +38,65 @@ This is a demo for how to use gRPC transconding with grpc-gateway and envoy, it'
 
 > Because envoy runs with docker, we must set localhost IP for envoy to allow communicating with `greeter_server` from inside container.
 
-`sh configure-localhost 1.1.1.1`.
+`sh sbin/configure-envoy 1.1.1.1`.
 
-2. Build helloworld
+2. Build `greeter` and launch `greeter_server`/`greeter_gateway`
 
 ```shell
-cd helloworld
 make bin
 ```
 
-3. Launch `greeter_server`/`greeter_gateway`
-
-Open 2 different terminals to run these 2 servers.
+Open 2 more terminals to run `greeter_server`/`greeter_gateway`
 
 ```shell
-cd helloworld
 ./bin/greeter_server
 ./bin/greeter_gateway
 ```
 
-Open another terminal, to check with `greeter_client` that `greeter_server` is ok.
+Open 1 more terminal, run `greeter_client` to check `greeter_server` is ok.
 
 ```shell
 ./bin/greeter_client
 ```
 
-4. Try RESTful with `greeter_gateway`
+If all things are right, a response message is responded.
 
-```shell
-sh restful gateway
+```
+2024/02/28 11:24:31 Greeting: Hello world
 ```
 
-5. Launch envoy
+3. Try RESTful with `greeter_gateway`
 
 ```shell
-sh runenvoy
+sh sbin/restful gateway
 ```
 
-6. Try RESTful with `envoy`
+If all things are right, a response JSON is responded.
+
+```
+{"message":"Hello world"}
+```
+
+4. Launch envoy
+
+> `envoy` will be launched with `Docker`, thus it's required you are as `root` or having the privilidge for `sudo`.
+
+Open another terminal to run `envoy`.
+
+```shell
+sh sbin/runenvoy
+```
+
+5. Try RESTful with `envoy`
 
 ```shell
 sh restful envoy
+```
+
+If all things are right, a response JSON is responded.
+
+```
+{
+ "message": "Hello world"
+}
 ```
