@@ -20,16 +20,14 @@ option java_package = "io.grpc.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 
 import "google/api/annotations.proto";
-//import "google/protobuf/any.proto";
 
-package helloworld;
+package helloworld.v1;
 
 // The greeting service definition.
-service Greeter {
+service GreeterService {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+  rpc SayHello (SayHelloRequest) returns (SayHelloResponse) {
     option (google.api.http) = {
-      //post: "/helloworld.Greeter/SayHello"
       post: "/v1/sayhello"
       body: "*"
     };
@@ -37,7 +35,7 @@ service Greeter {
 }
 
 // The request message containing the user's name.
-message HelloRequest {
+message SayHelloRequest {
   message SubMessage {
     int32 id = 1;
     string text = 2;
@@ -47,6 +45,6 @@ message HelloRequest {
 }
 
 // The response message containing the greetings
-message HelloReply {
+message SayHelloResponse {
   string message = 1;
 }

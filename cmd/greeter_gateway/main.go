@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	gw "github.com/spgyip/grpc-gateway-json-transconding/helloworld/helloworld"
+	helloworldv1 "github.com/spgyip/grpc-gateway-json-transconding/protogen/helloworld/v1"
 )
 
 var (
@@ -29,7 +29,7 @@ func main() {
 	// Note: Make sure the gRPC server is running properly and accessible
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := gw.RegisterGreeterHandlerFromEndpoint(
+	err := helloworldv1.RegisterGreeterServiceHandlerFromEndpoint(
 		ctx,
 		mux,
 		*grpcServerEndpoint,

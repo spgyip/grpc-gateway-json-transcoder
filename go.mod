@@ -1,10 +1,10 @@
-module github.com/spgyip/grpc-gateway-json-transconding/helloworld
+module github.com/spgyip/grpc-gateway-json-transconding
 
 go 1.20
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
-	google.golang.org/genproto/googleapis/api v0.0.0-20240221002015-b0ce06bbee7c
+	google.golang.org/genproto/googleapis/api v0.0.0-20240227224415-6ceb2ff114de
 	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.32.0
 )
