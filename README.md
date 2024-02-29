@@ -1,4 +1,4 @@
-gRPC is broadly used by developing microservices, it's very efficient when both client and server side are microservices. However, when you are developing API for web or native-app, RESTful-JSON API is another standard suitable for end-to-end developing. Further, RESTful-JSON which based on HTTP/JSON has better ecology for developers debugging/testing.
+gRPC is broadly used by developing microservices, it's very efficient when both client and server side are microservices. However, when you are developing API for web or native-app, RESTful-JSON API is another standard suitable for end-to-end developing. Further, RESTful-JSON which is based on HTTP/JSON has better ecology for developers debugging/testing.
 
 We can write a RESTful-JSON microservices for each gRPC microservices to translate between the RESTful-JSON/gRPC protocol, but this is awkward. So, in order to communicate to your gRPC service, there are several ways, we are going to demonstrate here.
 
@@ -21,7 +21,7 @@ This topology shows that there are several ways to communicate with `greeter_ser
 - `grpc_gateway` as proxy, use `curl` to communicate to proxy with RESTful.
 - `envoy` as proxy, use `curl` to communicate to proxy with RESTful. 
     - The `Descriptor` file(*helloworld.pb*) must be provided.
-- Use `grpcurl` to communicate directly to `greeter_server`, however `grpcurl` supports translate JSON to protobuf. 
+- Use `grpcurl` to communicate directly to `greeter_server`, `grpcurl` supports translation between JSON and protobuf. 
     - The `Descriptor` file(*helloworld.pb*) must be provided.
     - Another option for `Descriptor` is, if the `greeter_server` supports `server reflection`, `grpcurl` will fetch `Descriptor` from server automatically. 
 
@@ -142,7 +142,7 @@ If all things are right, a response JSON is responded.
 
 # Server reflection
 
-As demonstrations above, there is a bad experience when using `grpcurl` or `envoy` proxy, a `Descriptor`(*helloworld.pb*) file must be provided. We can use [Server reflection](https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md) to make things simpler. That's the `gRPC` server provides a method returns the `Descriptor`, the client side can obtain `Descriptor` through the reflection method, which can omit the *helloworld.pb* file at client side.
+As demonstrations above, there is a bad experience when using `grpcurl` or `envoy` proxy, a `Descriptor`(*helloworld.pb*) file must be provided. We can use [Server reflection](https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md) to make things simpler. The `gRPC` server provides a relection method returning the `Descriptor`, client side can obtain `Descriptor` through this method. Then the *helloworld.pb* file can be omitted at client side.
 
 > It's a pity that server reflection hasn't been supported by envoy yet. 
 > 
@@ -170,5 +170,8 @@ Then try `grpcurl` by removing the *helloworld.pb* again, you can see all things
 
 ```shell
 sh sbin/grpcurl
+{
+  "message": "Hello hello-from-grpcurl"
+}
 ```
 
