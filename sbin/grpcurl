@@ -1,0 +1,11 @@
+#!/bin/bash
+
+opts=""
+
+descriptor=$1
+if [ "${descriptor}" != "" ]
+then
+    opts="-protoset ${descriptor}"
+fi
+
+grpcurl ${opts} -plaintext -d '{"name": "hello-from-grpcurl"}' 127.0.0.1:50051 helloworld.v1.GreeterService/SayHello
