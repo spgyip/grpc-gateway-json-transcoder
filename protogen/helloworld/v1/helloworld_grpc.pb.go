@@ -18,7 +18,7 @@
 // - protoc             (unknown)
 // source: helloworld/v1/helloworld.proto
 
-package helloworld
+package helloworldv1
 
 import (
 	context "context"

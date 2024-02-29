@@ -24,4 +24,3 @@ curl -X POST -d '{"name": "world", "sub": {"id": 123, "text": "supergui"}}' ${ad
 ## `buf-curl` default is using protocol `connectrpc`, use `--protocol grpc` to use gRPC compatible wires.
 # buf curl -v --protocol grpc --http2-prior-knowledge --schema proto --data '{"name": "helloworld"}' http://127.0.0.1:50051/helloworld.v1.GreeterService/SayHello
 
-# grpcurl -protoset ./config/envoy/helloworld.pb -plaintext -d '{"name": "hello"}' 127.0.0.1:50051 helloworld.v1.GreeterService/SayHello

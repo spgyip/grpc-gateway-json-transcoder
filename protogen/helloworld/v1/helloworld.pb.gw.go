@@ -2,11 +2,11 @@
 // source: helloworld/v1/helloworld.proto
 
 /*
-Package helloworld is a reverse proxy.
+Package helloworldv1 is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package helloworld
+package helloworldv1
 
 import (
 	"context"
