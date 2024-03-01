@@ -26,7 +26,7 @@ import (
 	"log"
 	"net"
 
-	helloworldv1 "github.com/spgyip/grpc-gateway-json-transconding/protogen/helloworld/v1"
+	helloworldv1 "github.com/spgyip/grpc-gateway-json-transcoding/protogen/helloworld/v1"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

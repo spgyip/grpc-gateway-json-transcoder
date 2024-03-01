@@ -1,4 +1,4 @@
-module github.com/spgyip/grpc-gateway-json-transconding
+module github.com/spgyip/grpc-gateway-json-transcoding
 
 go 1.20
 
