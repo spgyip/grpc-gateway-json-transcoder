@@ -1,29 +1,21 @@
-gRPC is broadly used by developing microservices, it's very efficient when both client and server side are microservices. However, when you are developing API for web or native-app, RESTful-JSON API is another standard suitable for end-to-end developing. Further, RESTful-JSON which is based on HTTP/JSON has better ecology for developers debugging/testing.
+gRPC is broadly used by developing microservices, it's very efficient when both client and server sides are microservices. However, when collaborating with web or native-app, RESTful-JSON API is suitable for end-to-end developing. RESTful-JSON is based on HTTP/JSON which has better ecology for developers debugging/testing.
 
 We can write a RESTful-JSON microservices for each gRPC microservices to translate between the RESTful-JSON/gRPC protocol, but this is awkward. So, in order to communicate to your gRPC service, there are several ways, we are going to demonstrate here.
 
-- [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway).
-- [envoyproxy](https://envoyproxy.io).
-- [grpcurl](https://github.com/fullstorydev/grpcurl).
+- [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+- [envoyproxy](https://envoyproxy.io)
+- [grpcurl](https://github.com/fullstorydev/grpcurl)
 
+Below features are supported by `Protobuf`/`gRPC`.
 
-Some feature are supported by `Protobuf`/`gRPC`.
-
-- [gRPC transcoding](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding).
+- [gRPC transcoding](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding)
 - [Protobuf Descriptors](https://buf.build/docs/reference/descriptors)
 
+At the last part, we will introduce another solution [connect-go](https://connectrpc.com/docs/go/getting-started/).
 
 # Topology
 
-This topology shows that there are several ways to communicate with `greeter_server`
-
-- Use `greeter_client`, which is a gRPC client, to communicate directly to `greeter_server`.
-- `grpc_gateway` as proxy, use `curl` to communicate to proxy with RESTful.
-- `envoy` as proxy, use `curl` to communicate to proxy with RESTful. 
-    - The `Descriptor` file(*helloworld.pb*) must be provided.
-- Use `grpcurl` to communicate directly to `greeter_server`, `grpcurl` supports translation between JSON and protobuf. 
-    - The `Descriptor` file(*helloworld.pb*) must be provided.
-    - Another option for `Descriptor` is, if the `greeter_server` supports `server reflection`, `grpcurl` will fetch `Descriptor` from server automatically. 
+This topology shows what we are going to demostrate how to communicate with `greeter_server`
 
 ```
          --------------------------------------------------------------------------------------------------------------
@@ -51,9 +43,18 @@ This topology shows that there are several ways to communicate with `greeter_ser
                                                                                                                          (-protoset=*helloworld.pb*)
 ```
 
+- Use `greeter_client`, which is a gRPC client, to communicate directly to `greeter_server`.
+- `grpc_gateway` as proxy, use `curl` to communicate to proxy with RESTful.
+- `envoy` as proxy, use `curl` to communicate to proxy with RESTful. 
+    - The `Descriptor` file(*helloworld.pb*) must be provided.
+- Use `grpcurl` to communicate directly to `greeter_server`, `grpcurl` supports translation between JSON and protobuf. 
+    - The `Descriptor` file(*helloworld.pb*) must be provided.
+    - Another option for `Descriptor` is, if the `greeter_server` supports `server reflection`, `grpcurl` will fetch `Descriptor` from server automatically. 
+
+
 Protocol notation:
 - gRPC: http2+proto
-- RESTful: http+JSON
+- RESTful: http1/http2+JSON
 
 # Step-by-Step
 
@@ -175,3 +176,65 @@ sh sbin/grpcurl
 }
 ```
 
+# connect-go
+
+Apart from gRPC's official framework, [connect-go](https://connectrpc.com/docs/go/getting-started/) is another framework which is gRPC-compatible, and supports RESTful-JSON as well. 
+
+As in `buf.gen.yaml`, plugin `buf.build/connectrpc/go` is used to generate `connect-go` stub codes, locates at `protogen/helloworld/v1/helloworldv1connect/`. `greeter_server.connect` is implemented at `cmd/connect/greeter_server/`.
+
+Unlike `gRPC` protocol only supports `http2+proto`, `connect-go` protocol supports `http1|http2|http3+proto|JSON` without proxy at all. So, it's compatible with `gRPC` protocol.
+
+## Step-by-step
+
+1. Run `greeter_server.connect`
+
+```shell
+./bin/greeter_server.connect
+```
+
+2. Try `gRPC client`
+
+`connect-go` is compatible with `gRPC` protocol, so a `gRPC client` can communicate with `connect-go server`.
+
+
+```shell
+./bin/greeter_client -addr "localhost:60051"
+```
+
+A successful message should be printed.
+
+```shell
+2024/03/06 15:48:33 Greeting: Hello world
+```
+
+3. Try `http1+JSON`
+
+```shell
+curl -v -X POST --header "Content-Type: application/json" -d '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+4. Try `http2+JSON`
+
+> Make sure if your `curl` support `http2`: [curl-http2](https://curl.se/docs/http2.html).
+> Specify `--http2-prior-knowledge` to use `http2`.
+
+```shell
+curl -v -X POST --http2-prior-knowledge --header "Content-Type: application/json" -d '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+5. Try `http1+proto`
+
+> `buf-curl` supports protobuf serialization with `curl`.
+
+```shell
+buf curl -v --schema proto --data '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+6. Try `http2+proto`
+
+> `buf-curl` supports protobuf serialization with `curl`.
+>  Specify `--http2-prior-knowledge` to use `http2`.
+
+```shell
+buf curl -v --protocol grpc --http2-prior-knowledge --schema proto --data '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
