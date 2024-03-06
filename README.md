@@ -6,12 +6,12 @@ We can write a RESTful-JSON microservices for each gRPC microservices to transla
 - [envoyproxy](https://envoyproxy.io).
 - [grpcurl](https://github.com/fullstorydev/grpcurl).
 
-
-Some feature are supported by `Protobuf`/`gRPC`.
+These features are supported by `Protobuf`/`gRPC`.
 
 - [gRPC transcoding](https://cloud.google.com/service-infrastructure/docs/service-management/reference/rpc/google.api#grpc-transcoding).
 - [Protobuf Descriptors](https://buf.build/docs/reference/descriptors)
 
+At the last part, we will introduce [connect-go](https://connectrpc.com/docs/go/getting-started/).
 
 # Topology
 
@@ -53,7 +53,7 @@ This topology shows that there are several ways to communicate with `greeter_ser
 
 Protocol notation:
 - gRPC: http2+proto
-- RESTful: http+JSON
+- RESTful: http1/http2+JSON
 
 # Step-by-Step
 
@@ -175,3 +175,65 @@ sh sbin/grpcurl
 }
 ```
 
+# connect-go
+
+Apart from official gRPC framework, [connect-go](https://connectrpc.com/docs/go/getting-started/) is a gRPC-compatible framework, which supports both gRPC/RESTful-JSON. We will introduce it at the last part.
+
+As in `buf.gen.yaml`, plugin `buf.build/connectrpc/go` is used to generate `connect-go` stub codes, locates at `protogen/helloworld/v1/helloworldv1connect/`. `greeter_server.connect` is implemented at `cmd/connect/greeter_server/`.
+
+Unlike `gRPC` protocol only supports `http2+proto`, `connect-go` protocol supports `http1|http2|http3+proto|JSON` without proxy at all. So, it's compatible with `gRPC` protocol.
+
+## Step-by-step
+
+1. Run `greeter_server.connect`
+
+```shell
+./bin/greeter_server.connect
+```
+
+2. Try `gRPC client`
+
+`connect-go` is compatible with `gRPC` protocol, so a `gRPC client` can communicate with `connect-go server`.
+
+
+```shell
+./bin/greeter_client -addr "localhost:60051"
+```
+
+A successful message should be printed.
+
+```shell
+2024/03/06 15:48:33 Greeting: Hello world
+```
+
+3. Try `http1+JSON`
+
+```shell
+curl -v -X POST --header "Content-Type: application/json" -d '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+4. Try `http2+JSON`
+
+> Make sure if your `curl` support `http2`: [curl-http2](https://curl.se/docs/http2.html).
+> Specify `--http2-prior-knowledge` to use `http2`.
+
+```shell
+curl -v -X POST --http2-prior-knowledge --header "Content-Type: application/json" -d '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+5. Try `http1+proto`
+
+> `buf-curl` supports protobuf serialization with `curl`.
+
+```shell
+buf curl -v --schema proto --data '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
+
+6. Try `http2+proto`
+
+> `buf-curl` supports protobuf serialization with `curl`.
+>  Specify `--http2-prior-knowledge` to use `http2`.
+
+```shell
+buf curl -v --protocol grpc --http2-prior-knowledge --schema proto --data '{"name": "helloworld"}' http://127.0.0.1:60051/helloworld.v1.GreeterService/SayHello
+```
